@@ -4,9 +4,9 @@ import pyarrow.parquet as pq
 
 csv_file = "E:/ebd_relAug-2022/ebd_relAug-2022.txt"
 
-chunksize = 100_000
+chunkSize = 100_000
 
-csv_stream = pd.read_csv(csv_file, sep='\t', chunksize=chunksize, low_memory=False)
+csv_stream = pd.read_csv(csv_file, sep='\t', chunksize=chunkSize, low_memory=False)
 
 countryParquetDict = dict()
 for i, chunk in enumerate(csv_stream):
@@ -35,6 +35,3 @@ for i, chunk in enumerate(csv_stream):
 
 for country, parquetLink in countryParquetDict.items():
     parquetLink.close()
-
-
-
