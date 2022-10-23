@@ -22,23 +22,26 @@ for i, chunk in enumerate(csv_stream):
     for country in groupedChunk.groups:
         parquet_file = "E:/eBirdData/countrySplits/{}.parquet".format(country)
         countryChunk = groupedChunk.get_group(country)
-        if country in countryList: # countryParquetDict.keys():
+        if country in countryList: 
             # load in previous chunk(s) data
             countryDatLoad = pq.read_table(parquet_file)
             # transform chunk into arrow table
             chunkTable = pa.Table.from_pandas(countryChunk, schema=parquet_schema)
-            combinedCountryDat = pa.concat_tables([countryDatLoad, countryChunk])
+            # combine previous chunk data and current chunk data
+            combinedCountryDat = pa.concat_tables([countryDatLoad, chunkTable])
+            # write to new parquet file
             parquet_writer = pq.ParquetWriter(parquet_file, parquet_schema, compression='snappy')
             parquet_writer.write_table(combinedCountryDat)
             parquet_writer.close()
             
         else:
-            parquet_writer = pq.ParquetWriter(parquet_file, parquet_schema, compression='snappy')
-            # Write CSV chunk to the parquet file
+            # convert pandas df to arrow table
             table = pa.Table.from_pandas(countryChunk, schema=parquet_schema)
+            # write chunk to parquet file
+            parquet_writer = pq.ParquetWriter(parquet_file, parquet_schema, compression='snappy')
             parquet_writer.write_table(table)
-            # countryParquetDict[country] = parquet_writer
             parquet_writer.close()
+            # append countryList so this data will be pulled in later
             countryList.append(country)
     
 
