@@ -1,12 +1,13 @@
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
+import pdb
 
 csv_file = "E:/ebd_relAug-2022/ebd_relAug-2022.txt"
 
 chunkSize = 100_000
 
-csv_stream = pd.read_csv(csv_file, sep='\t', chunksize=chunkSize, low_memory=False)
+csv_stream = pd.read_csv(csv_file, sep = '\t', chunksize = chunkSize, low_memory = False)
 
 countryList = list()
 for i, chunk in enumerate(csv_stream):
@@ -22,11 +23,13 @@ for i, chunk in enumerate(csv_stream):
         parquet_file = "E:/eBirdData/countrySplits/{}.parquet".format(country)
         countryChunk = groupedChunk.get_group(country)
         if country in countryList: # countryParquetDict.keys():
-            countryDatLoad = pq.read_table(parquet_file).to_pandas()
-            countryDat = pd.concat([countryDatLoad, countryChunk])
+            # load in previous chunk(s) data
+            countryDatLoad = pq.read_table(parquet_file)
+            # transform chunk into arrow table
+            chunkTable = pa.Table.from_pandas(countryChunk, schema=parquet_schema)
+            combinedCountryDat = pa.concat_tables([countryDatLoad, countryChunk])
             parquet_writer = pq.ParquetWriter(parquet_file, parquet_schema, compression='snappy')
-            table = pa.Table.from_pandas(countryDat, schema=parquet_schema)
-            parquet_writer.write_table(table)
+            parquet_writer.write_table(combinedCountryDat)
             parquet_writer.close()
             
         else:
