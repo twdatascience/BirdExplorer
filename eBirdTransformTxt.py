@@ -8,7 +8,7 @@ chunkSize = 100_000
 
 csv_stream = pd.read_csv(csv_file, sep='\t', chunksize=chunkSize, low_memory=False)
 
-countryParquetDict = dict()
+countryList = list()
 for i, chunk in enumerate(csv_stream):
     print("Chunk", i)
     
@@ -21,17 +21,21 @@ for i, chunk in enumerate(csv_stream):
     for country in groupedChunk.groups:
         parquet_file = "E:/eBirdData/countrySplits/{}.parquet".format(country)
         countryChunk = groupedChunk.get_group(country)
-        if country in countryParquetDict.keys():
-            parquet_writer = countryParquetDict[country]
-            table = pa.Table.from_pandas(countryChunk, schema=parquet_schema)
+        if country in countryList: # countryParquetDict.keys():
+            countryDatLoad = pq.read_table(parquet_file).to_pandas()
+            countryDat = pd.concat([countryDatLoad, countryChunk])
+            parquet_writer = pq.ParquetWriter(parquet_file, parquet_schema, compression='snappy')
+            table = pa.Table.from_pandas(countryDat, schema=parquet_schema)
             parquet_writer.write_table(table)
+            parquet_writer.close()
+            
         else:
             parquet_writer = pq.ParquetWriter(parquet_file, parquet_schema, compression='snappy')
             # Write CSV chunk to the parquet file
             table = pa.Table.from_pandas(countryChunk, schema=parquet_schema)
             parquet_writer.write_table(table)
-            countryParquetDict[country] = parquet_writer
-         
+            # countryParquetDict[country] = parquet_writer
+            parquet_writer.close()
+            countryList.append(country)
+    
 
-for country, parquetLink in countryParquetDict.items():
-    parquetLink.close()
