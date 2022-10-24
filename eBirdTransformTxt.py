@@ -5,7 +5,7 @@ import pdb
 
 csv_file = "E:/ebd_relAug-2022/ebd_relAug-2022.txt"
 
-chunkSize = 100_000
+chunkSize = 1_000_000
 
 csv_stream = pd.read_csv(csv_file, sep = '\t', chunksize = chunkSize, low_memory = False)
 
