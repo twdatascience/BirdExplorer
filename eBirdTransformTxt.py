@@ -20,7 +20,7 @@ for i, chunk in enumerate(csv_stream):
 
     groupedChunk = chunk.groupby("COUNTRY")
     for country in groupedChunk.groups:
-        parquet_file = "E:/eBirdData/countrySplits/{}.parquet".format(country)
+        parquet_file = "C:/Users/Meso/Documents/GitHub/BirdExplorer/data/countrySplits/{}.parquet".format(country)
         countryChunk = groupedChunk.get_group(country)
         if country in countryList: 
             # load in previous chunk(s) data
