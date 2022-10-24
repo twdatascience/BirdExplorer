@@ -1,7 +1,7 @@
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
-import pdb
+
 
 csv_file = "E:/ebd_relAug-2022/ebd_relAug-2022.txt"
 
