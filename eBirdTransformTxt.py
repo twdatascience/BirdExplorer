@@ -20,7 +20,7 @@ for i, chunk in enumerate(csv_stream):
         
     chunkTable = pa.Table.from_pandas(chunk, schema=parquet_schema)
      # write to new parquet file   
-    parquet_writer.write_table(combinedCountryDat)
+    parquet_writer.write_table(chunkTable)
 
 parquet_writer.close()
 
