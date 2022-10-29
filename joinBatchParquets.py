@@ -21,7 +21,6 @@ for countryName, pathsTup in countryNames.items():
     if not os.path.exists(newFolder):
         os.makedirs(newFolder)
     parquet_file = os.path.join(newFolder, "{}.parquet".format(countryName))
-    pdb.set_trace()
     if os.path.exists(parquet_file):
         continue
     batchTables = list()
